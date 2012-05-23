@@ -24,31 +24,23 @@ describe UserSessionsController do
   # UserSession. As you add validations to UserSession, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    {}
+    { login: "logger",
+      password: "geheim"}
   end
   
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
   # UserSessionsController. Be sure to keep this updated too.
   def valid_session
-    {}
+    nil
+  end
+  
+  before(:each) do
+    activate_authlogic
+    @logged_in_user = FactoryGirl.create(:logged_in_user)
+ #   FactoryGirl.create(:user_session)   
   end
 
-  describe "GET index" do
-    it "assigns all user_sessions as @user_sessions" do
-      user_session = UserSession.create! valid_attributes
-      get :index, {}, valid_session
-      assigns(:user_sessions).should eq([user_session])
-    end
-  end
-
-  describe "GET show" do
-    it "assigns the requested user_session as @user_session" do
-      user_session = UserSession.create! valid_attributes
-      get :show, {:id => user_session.to_param}, valid_session
-      assigns(:user_session).should eq(user_session)
-    end
-  end
 
   describe "GET new" do
     it "assigns a new user_session as @user_session" do
@@ -57,107 +49,41 @@ describe UserSessionsController do
     end
   end
 
-  describe "GET edit" do
-    it "assigns the requested user_session as @user_session" do
-      user_session = UserSession.create! valid_attributes
-      get :edit, {:id => user_session.to_param}, valid_session
-      assigns(:user_session).should eq(user_session)
-    end
-  end
 
   describe "POST create" do
     describe "with valid params" do
       it "creates a new UserSession" do
-        expect {
-          post :create, {:user_session => valid_attributes}, valid_session
-        }.to change(UserSession, :count).by(1)
-      end
-
-      it "assigns a newly created user_session as @user_session" do
         post :create, {:user_session => valid_attributes}, valid_session
-        assigns(:user_session).should be_a(UserSession)
-        assigns(:user_session).should be_persisted
+        controller.current_user.should eq(@logged_in_user)
       end
-
-      it "redirects to the created user_session" do
-        post :create, {:user_session => valid_attributes}, valid_session
-        response.should redirect_to(UserSession.last)
-      end
-    end
+   end
 
     describe "with invalid params" do
       it "assigns a newly created but unsaved user_session as @user_session" do
         # Trigger the behavior that occurs when invalid params are submitted
-        UserSession.any_instance.stub(:save).and_return(false)
         post :create, {:user_session => {}}, valid_session
         assigns(:user_session).should be_a_new(UserSession)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
-        UserSession.any_instance.stub(:save).and_return(false)
         post :create, {:user_session => {}}, valid_session
         response.should render_template("new")
       end
     end
   end
 
-  describe "PUT update" do
-    describe "with valid params" do
-      it "updates the requested user_session" do
-        user_session = UserSession.create! valid_attributes
-        # Assuming there are no other user_sessions in the database, this
-        # specifies that the UserSession created on the previous line
-        # receives the :update_attributes message with whatever params are
-        # submitted in the request.
-        UserSession.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, {:id => user_session.to_param, :user_session => {'these' => 'params'}}, valid_session
-      end
-
-      it "assigns the requested user_session as @user_session" do
-        user_session = UserSession.create! valid_attributes
-        put :update, {:id => user_session.to_param, :user_session => valid_attributes}, valid_session
-        assigns(:user_session).should eq(user_session)
-      end
-
-      it "redirects to the user_session" do
-        user_session = UserSession.create! valid_attributes
-        put :update, {:id => user_session.to_param, :user_session => valid_attributes}, valid_session
-        response.should redirect_to(user_session)
-      end
-    end
-
-    describe "with invalid params" do
-      it "assigns the user_session as @user_session" do
-        user_session = UserSession.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        UserSession.any_instance.stub(:save).and_return(false)
-        put :update, {:id => user_session.to_param, :user_session => {}}, valid_session
-        assigns(:user_session).should eq(user_session)
-      end
-
-      it "re-renders the 'edit' template" do
-        user_session = UserSession.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        UserSession.any_instance.stub(:save).and_return(false)
-        put :update, {:id => user_session.to_param, :user_session => {}}, valid_session
-        response.should render_template("edit")
-      end
-    end
-  end
-
   describe "DELETE destroy" do
-    it "destroys the requested user_session" do
-      user_session = UserSession.create! valid_attributes
-      expect {
+      it "destroys the requested user_session" do
+        user_session = UserSession.create! valid_attributes
         delete :destroy, {:id => user_session.to_param}, valid_session
-      }.to change(UserSession, :count).by(-1)
-    end
+        controller.current_user.should be nil
+      end
 
     it "redirects to the user_sessions list" do
       user_session = UserSession.create! valid_attributes
       delete :destroy, {:id => user_session.to_param}, valid_session
-      response.should redirect_to(user_sessions_url)
+      response.should redirect_to(login_path)
     end
   end
 

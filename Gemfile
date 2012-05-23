@@ -5,6 +5,7 @@ gem 'rails', '3.2.2'
 
 gem 'sqlite3'
 gem 'authlogic'
+gem 'factory_girl_rails'
 
 group :development, :test do
   gem 'rspec-rails'

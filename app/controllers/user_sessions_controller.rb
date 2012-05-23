@@ -34,7 +34,7 @@ class UserSessionsController < ApplicationController
     @user_session.destroy
 
     respond_to do |format|
-      format.html { redirect_to new_user_session_path , notice: 'Logged out.'}
+      format.html { redirect_to(login_path , notice: 'Logged out.')}
       format.json { head :no_content }
     end
   end
